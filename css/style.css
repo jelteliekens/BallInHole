@@ -9,7 +9,7 @@ html {
 }
 
 body {
-    background-color: #cccccc;
+    background-color: #262626;
 
     padding: 0.5em;
 
@@ -25,15 +25,15 @@ body {
     position: relative;
 }
 
-#timer {
-    background-color: #3F6CAF;
+#timercontainer {
+    background-color: rgba(217, 115, 7, 1);
     text-align: center;
     height: 2.5em;
     border-radius: 0.3em;
 
 }
 
-#timer p {
+#timercontainer p {
     font-weight: bold;
     font-size: 2em;
     color: white;
@@ -50,9 +50,10 @@ body {
     margin-bottom: 0.5em;
     margin-top: 0.5em;
 
-    background-color: #B7CF8A;
+    background-color: rgba(7, 178, 217, 1);
 
-    border:solid 0.3em #3F6CAF;
+    border:solid 0.3em;
+    border-color: rgba(7, 178, 217, 0.5);
     border-radius: 0.3em;
 }
 
@@ -80,17 +81,36 @@ button {
     border: none;
     border-radius: 0.3em;
 
-    background-color: rgba(63,108,175,0.9);
+    background-color: rgba(217, 115, 7, 0.9);
 
     color: white;
 }
 
 button:disabled {
-    background-color: rgba(63,108,175,0.5);
+    background-color: rgba(217, 115, 7, 0.5);
     color: rgba(255,255,255,0.5);
 }
 
 button:hover:enabled {
-    background-color: rgba(63,108,175,1);
+    background-color: rgba(217, 115, 7, 1);
 }
 
+@media screen and (orientation: portrait) {
+    #container {
+        visibility: visible;
+    }
+
+    #landscape {
+        visibility: hidden;
+    }
+}
+
+@media screen and (orientation: landscape) {
+    #container {
+        visibility: hidden;
+    }
+
+    #landscape {
+        visibility: visible;
+    }
+}

@@ -1,28 +1,53 @@
 window.onload = init;
 
 var winW, winH, winT;
-var ball;
 var mouseDownInsideball;
 var touchDownInsideball;
 var movementTimer;
 var lastMouse, lastOrientation, lastTouch;
+var gameSurface;
+var btnStart, btnPause, btnStop;
+var timerLabel;
+
+var isStarted = 0, isPlaying = 0;
 
 // Initialisation on opening of the window
 function init() {
+    gameSurface = document.getElementById('game');
+
+    btnStart = document.getElementById('btnStart');
+    btnPause = document.getElementById('btnPause');
+    btnStop = document.getElementById('btnStop');
+
+    timerLabel = document.getElementById('timer');
+
     lastOrientation = {};
-    window.addEventListener('resize', doLayout, false);
-    document.body.addEventListener('mousemove', onMouseMove, false);
-    document.body.addEventListener('mousedown', onMouseDown, false);
-    document.body.addEventListener('mouseup', onMouseUp, false);
-    document.body.addEventListener('touchmove', onTouchMove, false);
-    document.body.addEventListener('touchstart', onTouchDown, false);
-    document.body.addEventListener('touchend', onTouchUp, false);
-    window.addEventListener('deviceorientation', deviceOrientationTest, false);
+    addListeners();
     lastMouse = {x: 0, y: 0};
     lastTouch = {x: 0, y: 0};
     mouseDownInsideball = false;
     touchDownInsideball = false;
-    doLayout(document);
+
+    doLayout(gameSurface);
+}
+
+function addListeners() {
+
+    //Controls
+    btnStart.addEventListener('click', start, false);
+    btnPause.addEventListener('click', pause, false);
+    btnStop.addEventListener('click', stop, false);
+
+    //Surface
+    window.addEventListener('resize', doLayout, false);
+    gameSurface.addEventListener('mousemove', onMouseMove, false);
+    gameSurface.addEventListener('mousedown', onMouseDown, false);
+    gameSurface.addEventListener('mouseup', onMouseUp, false);
+    gameSurface.addEventListener('touchmove', onTouchMove, false);
+    gameSurface.addEventListener('touchstart', onTouchDown, false);
+    gameSurface.addEventListener('touchend', onTouchUp, false);
+    window.addEventListener('deviceorientation', deviceOrientationTest, false);
+
 }
 
 // Does the gyroscope or accelerometer actually work?
@@ -35,34 +60,60 @@ function deviceOrientationTest(event) {
 }
 
 function doLayout(event) {
-    winW = document.getElementById('game').offsetWidth;
-    winH = document.getElementById('game').offsetHeight;
-    winT = document.getElementById('game').offsetTop;
+    winW = gameSurface.offsetWidth;
+    winH = gameSurface.offsetHeight;
+    winT = gameSurface.offsetTop;
 
     var surface = document.getElementById('surface');
     surface.width = winW;
     surface.height = winH;
-    var radius = 15;
-    ball = {    radius: radius,
+
+    var ballRadius = 15;
+    ball = {    radius: ballRadius,
         x: Math.round(winW / 2),
         y: Math.round(winH / 2),
-        color: 'rgba(255, 0, 0, 255)'};
+        color: 'rgb(140,52,4)'};
 
-    renderBall();
+    var holeRadius = ballRadius + 3;
+    hole = {
+        radius: holeRadius,
+        x: 30,
+        y: 30,
+        color: 'rgb(4,115,140)'
+    };
 }
 
-function renderBall() {
-    var surface = document.getElementById('surface');
+function playGame(xDelta, yDelta) {
+    moveBall(xDelta, yDelta);
+
+    if (ball.x + ball.radius < hole.x + hole.radius
+        && ball.x - ball.radius > hole.x - hole.radius
+        && ball.y + ball.radius < hole.y + hole.radius
+        && ball.y - ball.radius > hole.y - hole.radius) {
+
+        var time = timeString;
+        chronoStop();
+        alert('Congratulations, Your time is ' + time + '!');
+    }
+
+    renderCanvas();
+}
+
+function renderCanvas() {
+
+    if (isPlaying && isStarted) {
+        var surface = document.getElementById('surface');
+        var context = surface.getContext('2d');
+        context.clearRect(0, 0, surface.width, surface.height);
+
+        renderHole(context);
+        renderBall(context);
+    }
+}
+
+function clearCanvas() {
     var context = surface.getContext('2d');
     context.clearRect(0, 0, surface.width, surface.height);
-
-    context.beginPath();
-    context.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI, false);
-    context.fillStyle = ball.color;
-    context.fill();
-    context.lineWidth = 1;
-    context.strokeStyle = ball.color;
-    context.stroke();
 }
 
 function onRenderUpdate(event) {
@@ -88,30 +139,7 @@ function onRenderUpdate(event) {
             xDelta = lastOrientation.gamma;
             yDelta = lastOrientation.beta;
     }
-    moveBall(xDelta, yDelta);
-}
-
-function moveBall(xDelta, yDelta) {
-    var xTest = ball.x + xDelta;
-    var yTest = ball.y + yDelta;
-
-    if (xTest > ball.radius && xTest < (winW - ball.radius)) {
-        ball.x += xDelta;
-    } else if (xTest <= ball.radius) {
-        ball.x = ball.radius;
-    } else if (xTest >= winW - ball.radius) {
-        ball.x = winW - ball.radius;
-    }
-
-    if (yTest > ball.radius && yTest < (winH - ball.radius)) {
-        ball.y += yDelta;
-    } else if (yTest <= ball.radius) {
-        ball.y = ball.radius;
-    } else if (yTest >= winH - ball.radius) {
-        ball.y = winH - ball.radius;
-    }
-
-    renderBall();
+    playGame(xDelta, yDelta);
 }
 
 function onMouseMove(event) {
@@ -119,7 +147,7 @@ function onMouseMove(event) {
         var xDelta, yDelta;
         xDelta = event.clientX - lastMouse.x;
         yDelta = event.clientY - lastMouse.y;
-        moveBall(xDelta, yDelta);
+        playGame(xDelta, yDelta);
         lastMouse.x = event.clientX;
         lastMouse.y = event.clientY;
     }
@@ -163,7 +191,7 @@ function onTouchMove(event) {
 
         xDelta = xav - lastTouch.x;
         yDelta = yav - lastTouch.y;
-        moveBall(xDelta, yDelta);
+        playGame(xDelta, yDelta);
         lastTouch.x = xav;
         lastTouch.y = yav;
     }
@@ -195,3 +223,60 @@ function onDeviceOrientationChange(event) {
     lastOrientation.gamma = event.gamma;
     lastOrientation.beta = event.beta;
 }
+
+function start() {
+    console.log('start');
+
+    if (!isPlaying) {
+        if (isStarted) {
+
+            btnStart.disabled = "disabled";
+            btnPause.disabled = "";
+            btnStop.disabled = "";
+
+            chronoContinue();
+            isPlaying = 1;
+
+        } else {
+
+            btnStart.disabled = "disabled";
+            btnPause.disabled = "";
+            btnStop.disabled = "";
+
+            chronoStart();
+            isStarted = 1;
+            isPlaying = 1;
+        }
+    }
+
+    renderCanvas();
+}
+
+function pause() {
+    console.log('pause');
+
+    if (isStarted && isPlaying) {
+        btnStart.disabled = "";
+        btnPause.disabled = "disabled";
+        btnStop.disabled = "";
+        chronoPause();
+        isPlaying = 0;
+    }
+}
+
+function stop() {
+    console.log('stop');
+
+    btnStart.disabled = "";
+    btnPause.disabled = "disabled";
+    btnStop.disabled = "disabled";
+
+    timerLabel.innerHTML = "00:00";
+
+    chronoStop();
+    isPlaying = 0;
+    isStarted = 0;
+
+    clearCanvas();
+}
+

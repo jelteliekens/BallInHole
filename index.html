@@ -5,16 +5,19 @@
     <meta name="viewport" content="width=device-width, user-scalable=false;">
 
     <title>Moving Ball Illustration</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="movingBall.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script src="js/timer.js"></script>
+    <script src="js/ball.js"></script>
+    <script src="js/hole.js"></script>
+    <script src="js/game.js"></script>
 
 </head>
 <body>
 
 <div id="container">
 
-    <div id="timer">
-        <p>00:00</p>
+    <div id="timercontainer">
+        <p id="timer">00:00</p>
     </div>
 
     <div id="game">
@@ -24,9 +27,9 @@
     </div>
 
     <div id="controls">
-        <button id="btnStart" type="button" onclick="alert('start')">Start</button>
-        <button id="btnContinue" type="button" disabled>Pauze</button>
-        <button id="btnPauze" type="button" disabled>Stop</button>
+        <button id="btnStart" type="button">Start</button>
+        <button id="btnPause" type="button" disabled>Pause</button>
+        <button id="btnStop" type="button" disabled>Stop</button>
     </div>
 
 </div>
