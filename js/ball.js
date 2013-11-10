@@ -7,7 +7,7 @@ function renderBall(context) {
     context.fillStyle = ball.color;
     context.fill();
     context.lineWidth = 1;
-    context.strokeStyle = ball.color;
+    context.strokeStyle = ball.stoke;
     context.stroke();
 }
 

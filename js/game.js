@@ -21,8 +21,13 @@ function init() {
 
     timerLabel = document.getElementById('timer');
 
+    //EventListeners
+    window.addEventListener('resize', doLayout, false);
+    btnStart.addEventListener('click', start, false);
+    btnPause.addEventListener('click', pause, false);
+    btnStop.addEventListener('click', stop, false);
+
     lastOrientation = {};
-    addListeners();
     lastMouse = {x: 0, y: 0};
     lastTouch = {x: 0, y: 0};
     mouseDownInsideball = false;
@@ -33,13 +38,6 @@ function init() {
 
 function addListeners() {
 
-    //Controls
-    btnStart.addEventListener('click', start, false);
-    btnPause.addEventListener('click', pause, false);
-    btnStop.addEventListener('click', stop, false);
-
-    //Surface
-    window.addEventListener('resize', doLayout, false);
     gameSurface.addEventListener('mousemove', onMouseMove, false);
     gameSurface.addEventListener('mousedown', onMouseDown, false);
     gameSurface.addEventListener('mouseup', onMouseUp, false);
@@ -48,6 +46,17 @@ function addListeners() {
     gameSurface.addEventListener('touchend', onTouchUp, false);
     window.addEventListener('deviceorientation', deviceOrientationTest, false);
 
+}
+
+function removeListeners() {
+    gameSurface.removeEventListener('mousemove', onMouseMove, false);
+    gameSurface.removeEventListener('mousedown', onMouseDown, false);
+    gameSurface.removeEventListener('mouseup', onMouseUp, false);
+    gameSurface.removeEventListener('touchmove', onTouchMove, false);
+    gameSurface.removeEventListener('touchstart', onTouchDown, false);
+    gameSurface.removeEventListener('touchend', onTouchUp, false);
+    window.removeEventListener('deviceorientation', onDeviceOrientationChange, false);
+    clearInterval(movementTimer);
 }
 
 // Does the gyroscope or accelerometer actually work?
@@ -68,11 +77,11 @@ function doLayout(event) {
     surface.width = winW;
     surface.height = winH;
 
-    var ballRadius = 15;
+    var ballRadius = 10;
     ball = {    radius: ballRadius,
         x: Math.round(winW / 2),
         y: Math.round(winH / 2),
-        color: 'rgb(140,52,4)'};
+        color: 'rgba(140,52,4,1)'};
 
     var holeRadius = ballRadius + 3;
     hole = {
@@ -92,7 +101,7 @@ function playGame(xDelta, yDelta) {
         && ball.y - ball.radius > hole.y - hole.radius) {
 
         var time = timeString;
-        chronoStop();
+        stop();
         alert('Congratulations, Your time is ' + time + '!');
     }
 
@@ -225,9 +234,10 @@ function onDeviceOrientationChange(event) {
 }
 
 function start() {
-    console.log('start');
-
     if (!isPlaying) {
+
+        addListeners();
+
         if (isStarted) {
 
             btnStart.disabled = "disabled";
@@ -243,6 +253,12 @@ function start() {
             btnPause.disabled = "";
             btnStop.disabled = "";
 
+            ball.x = ball.radius + Math.round((Math.random() * (winW - 2 * ball.radius)) + 1);
+            ball.y = ball.radius + Math.round((Math.random() * (winH - 2 * ball.radius)) + 1);
+
+            hole.x = hole.radius + Math.round((Math.random() * (winW - 2 * hole.radius)) + 1);
+            hole.y = hole.radius + Math.round((Math.random() * (winH - 2 * hole.radius)) + 1);
+
             chronoStart();
             isStarted = 1;
             isPlaying = 1;
@@ -253,9 +269,10 @@ function start() {
 }
 
 function pause() {
-    console.log('pause');
 
     if (isStarted && isPlaying) {
+        removeListeners();
+
         btnStart.disabled = "";
         btnPause.disabled = "disabled";
         btnStop.disabled = "";
@@ -265,7 +282,8 @@ function pause() {
 }
 
 function stop() {
-    console.log('stop');
+
+    removeListeners();
 
     btnStart.disabled = "";
     btnPause.disabled = "disabled";

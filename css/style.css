@@ -94,23 +94,3 @@ button:disabled {
 button:hover:enabled {
     background-color: rgba(217, 115, 7, 1);
 }
-
-@media screen and (orientation: portrait) {
-    #container {
-        visibility: visible;
-    }
-
-    #landscape {
-        visibility: hidden;
-    }
-}
-
-@media screen and (orientation: landscape) {
-    #container {
-        visibility: hidden;
-    }
-
-    #landscape {
-        visibility: visible;
-    }
-}
