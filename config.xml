@@ -21,9 +21,9 @@
     <preference name="orientation" value="portrait"/>
     <preference name="target-device" value="handset"/>
     <preference name="fullscreen" value="true"/>
-    <preference name="webviewbounce" value="true"/>
+    <preference name="webviewbounce" value="false"/>
     <preference name="stay-in-webview" value="false"/>
-    <preference name="ios-statusbarstyle" value="default"/>
+    <preference name="ios-statusbarstyle" value="black-opaque" />
     <preference name="detect-data-types" value="true"/>
     <preference name="exit-on-suspend" value="true"/>
     <preference name="show-splash-screen-spinner" value="true"/>
